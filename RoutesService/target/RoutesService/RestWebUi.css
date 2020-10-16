@@ -1,0 +1,32 @@
+div {
+    margin-left: 10px;
+    padding-left: 3px;
+    border-left: 2px solid white;
+}
+
+div:hover {
+    border-left: 2px solid gray;
+}
+
+pre {
+    margin: 0px;
+    font-size: 13px;
+    display: inline;
+}
+
+.attrValue {
+    font-family: monospace;
+    font-size: 13px;
+}
+
+.notimpl {
+    color: pink;
+}
+
+.invalid {
+    color: red;
+}
+
+.unknown {
+    color: gray;
+}

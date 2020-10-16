@@ -1,0 +1,209 @@
+<?xml version="1.0" standalone="yes"?>
+<xs:schema version="1.0" elementFormDefault="qualified"
+           targetNamespace="main.webapp.xml"
+           xmlns="main.webapp.xml"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+
+    <xs:element name="Route" type="RouteType"/>
+    <xs:element name="RoutesQueryResult" type="RoutesQueryResultType"/>
+
+    <xs:element name="DistanceSumQueryResult" type="DistanceQueryResultType"/>
+    <xs:element name="QueryRoutesByNameSpec" type="QueryRoutesByNameSpecType"/>
+    <xs:element name="DeleteRouteByDistanceSpec" type="DeleteRouteByDistanceSpecType"/>
+
+    <xs:element name="OperationStatusInfo" type="OperationStatusInfoType" />
+    <xs:element name="ErrorInfo" type="ErrorInfoType" />
+
+    <!-- ======================================================================================================= -->
+
+    <xs:complexType name="ObjectType" abstract="true">
+        <xs:sequence>
+            <xs:element name="Discoverability" type="DiscoverabilityType" minOccurs="0" maxOccurs="1"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="DistanceQueryResultType">
+        <xs:complexContent>
+            <xs:extension base="ObjectType">
+                <xs:attribute name="Value" type="xs:long" use="required"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="QueryRoutesByNameSpecType">
+        <xs:attribute name="ExactName" type="xs:string" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="DeleteRouteByDistanceSpecType">
+        <xs:attribute name="ExactDistance" type="xs:long" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="OperationStatusInfoType">
+        <xs:sequence>
+            <xs:element name="Message" type="xs:string" />
+        </xs:sequence>
+        <xs:attribute name="Status" type="OperationStatus" use="required" />
+    </xs:complexType>
+
+    <xs:simpleType name="OperationStatus">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="Accomplished" />
+            <xs:enumeration value="Denied" />
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="ErrorInfoType">
+        <xs:sequence>
+            <xs:element name="Message" type="xs:string" />
+            <xs:element name="StackTrace" type="xs:string" />
+        </xs:sequence>
+        <xs:attribute name="Type" type="xs:string" use="required" />
+    </xs:complexType>
+
+    <!-- Region routes -->
+
+    <xs:complexType name="RoutesQueryResultType">
+        <xs:complexContent>
+            <xs:extension base="ObjectType">
+                <xs:sequence>
+                    <xs:element name="Routes" type="RoutesListType"/>
+                </xs:sequence>
+                <xs:attribute name="PageSize" type="xs:long" use="required"/>
+                <xs:attribute name="PageNumber" type="xs:long" use="required"/>
+                <xs:attribute name="PagesCount" type="xs:long" use="required"/>
+                <xs:attribute name="TotalCount" type="xs:long" use="required"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="RoutesListType">
+        <xs:sequence>
+            <xs:element ref="Route" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="RouteType">
+        <xs:complexContent>
+            <xs:extension base="ObjectType">
+                <xs:sequence>
+                    <xs:element name="Coordinates" type="CoordinatesType"/>
+                    <xs:element name="CreationDate" type="localDate"/>
+                    <xs:element name="From" type="LocationType"/>
+                    <xs:element name="To" type="LocationType"/>
+                </xs:sequence>
+                <xs:attribute name="Id" type="id" use="required"/>
+                <xs:attribute name="Name" type="nonEmptyString" use="required"/>
+                <xs:attribute name="Distance" type="distance" use="required"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+
+    <xs:complexType name="LocationType">
+        <xs:attribute name="X" type="xs:int" use="required"/>
+        <xs:attribute name="Y" type="xs:int" use="required"/>
+        <xs:attribute name="Z" type="xs:float" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="CoordinatesType">
+        <xs:sequence/>
+        <xs:attribute name="X" type="coordX" use="required"/>
+        <xs:attribute name="Y" type="coordY" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="localDate" final="extension restriction">
+        <xs:attribute name="Mills" type="xs:long" use="required"/>
+    </xs:complexType>
+
+    <xs:simpleType name="nonEmptyString">
+        <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="id">
+        <xs:restriction base="xs:long">
+            <xs:minExclusive value="0"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="distance">
+        <xs:restriction base="xs:long">
+            <xs:minExclusive value="1"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="coordX">
+        <xs:restriction base="xs:int">
+            <xs:maxInclusive value="241"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="coordY">
+        <xs:restriction base="xs:double">
+            <xs:maxInclusive value="180"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <!-- EndRegion -->
+
+    <!-- Region discoverability -->
+
+    <xs:complexType name="DiscoverabilityType">
+        <xs:sequence>
+            <xs:element name="Links" type="LinksListType" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="Actions" type="ActionsListType" minOccurs="0" maxOccurs="1"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="LinksListType">
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="Link" type="LinkType"/>
+        </xs:choice>
+    </xs:complexType>
+
+    <xs:complexType name="LinkType">
+        <xs:attribute name="Name" type="string" use="required"/>
+        <xs:attribute name="Id" type="id" use="optional"/>
+        <xs:attribute name="Kind" type="string" use="required"/>
+        <xs:attribute name="Href" type="string" use="required"/>
+        <xs:attribute name="Relation" type="LinkRelationType" use="required"/>
+    </xs:complexType>
+
+    <xs:simpleType name="LinkRelationType">
+        <xs:restriction base="string">
+            <xs:enumeration value="Up"/>
+            <xs:enumeration value="Down"/>
+            <xs:enumeration value="Forward"/>
+            <xs:enumeration value="Backward"/>
+            <xs:enumeration value="Related"/>
+            <xs:enumeration value="Alternate"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:complexType name="ActionsListType">
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="Action" type="ActionType"/>
+        </xs:choice>
+    </xs:complexType>
+
+    <xs:complexType name="ActionType">
+        <xs:attribute name="Name" type="string" use="required"/>
+        <xs:attribute name="Method" type="HttpMethodType" use="required"/>
+        <xs:attribute name="Href" type="string" use="required"/>
+        <xs:attribute name="ParamKind" type="string" use="optional"/>
+        <xs:attribute name="ResultKind" type="string" use="optional"/>
+    </xs:complexType>
+
+    <xs:simpleType name="HttpMethodType">
+        <xs:restriction base="string">
+            <xs:enumeration value="Post"/>
+            <xs:enumeration value="Put"/>
+            <xs:enumeration value="Get"/>
+            <xs:enumeration value="Delete"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <!-- EndRegion -->
+
+    <xs:simpleType name="string">
+        <xs:restriction base="xs:string"/>
+    </xs:simpleType>
+
+</xs:schema>
