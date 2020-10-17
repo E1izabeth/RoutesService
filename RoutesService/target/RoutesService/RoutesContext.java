@@ -133,14 +133,14 @@ public class RoutesContext implements AutoCloseable{
                 throw new RestApiException(HttpServletResponse.SC_BAD_REQUEST, "Inconsistent entity id: expected " + route.id + " while given " + newRoute.getId());
             }
 
-            route.name = newRoute.getName();
-            makeRoute(route, newRoute);
+            updateRouteEntity(route, newRoute);
 
             _dbCtx.update(route, new DbParametrizedQueryInfo("id = ?", new DbQueryParameter(1, id)));
         }
     }
 
-    private void makeRoute(RouteDbEntity route, RouteType newRoute) {
+    private void updateRouteEntity(RouteDbEntity route, RouteType newRoute) {
+        route.name = newRoute.getName();
         route.distance = newRoute.getDistance();
 
         route.coordX = newRoute.getCoordinates().getX();
@@ -156,9 +156,8 @@ public class RoutesContext implements AutoCloseable{
     }
 
     public void addNewRoute() throws Throwable {
-        RouteType newRoute = this.parseRequest(RouteType.class);
-        RouteDbEntity entity = decomposeEntity(newRoute);
-        entity.creationDateMills = System.currentTimeMillis();
+        RouteCreationSpecType newRouteSpec = this.parseRequest(RouteCreationSpecType.class);
+        RouteDbEntity entity = createRouteFromSpec(newRouteSpec);
         _dbCtx.insert(entity);
         this.prepareResponse(_xmlBuilder.translateRouteEntity(entity));
         _response.setStatus(HttpServletResponse.SC_CREATED);
@@ -191,13 +190,24 @@ public class RoutesContext implements AutoCloseable{
         this.queryRoutes("name contains \"" + spec.getExactName() + "\"", null, null, null);
     }
 
-    private RouteDbEntity decomposeEntity(RouteType route) {
+    private RouteDbEntity createRouteFromSpec(RouteCreationSpecType spec) {
         RouteDbEntity obj = new RouteDbEntity();
 
-        obj.id = route.getId();
-        obj.name = route.getName();
-        obj.creationDateMills = route.getCreationDate().getMills();
-        makeRoute(obj, route);
+        obj.name = spec.getName();
+        obj.creationDateMills = System.currentTimeMillis();
+
+        obj.distance = spec.getDistance();
+
+        obj.coordX = spec.getCoordinates().getX();
+        obj.coordY = spec.getCoordinates().getY();
+
+        obj.fromLocX = spec.getFrom().getX();
+        obj.fromLocY = spec.getFrom().getY();
+        obj.fromLocZ = spec.getFrom().getZ();
+
+        obj.toLocX = spec.getTo().getX();
+        obj.toLocY = spec.getTo().getY();
+        obj.toLocZ = spec.getTo().getZ();
 
         return obj;
     }

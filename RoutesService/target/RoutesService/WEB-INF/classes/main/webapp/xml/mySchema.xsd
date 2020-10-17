@@ -2,18 +2,19 @@
 <xs:schema version="1.0" elementFormDefault="qualified"
            targetNamespace="main.webapp.xml"
            xmlns="main.webapp.xml"
-           xmlns:xs="http://www.w3.org/2001/XMLSchema">
+           xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:XS="http://www.w3.org/2001/XMLSchema">
 
-
+    <xs:element name="RouteService" type="RouteServiceType"/>
     <xs:element name="Route" type="RouteType"/>
+    <xs:element name="RouteCreationSpec" type="RouteCreationSpecType"/>
     <xs:element name="RoutesQueryResult" type="RoutesQueryResultType"/>
 
     <xs:element name="DistanceSumQueryResult" type="DistanceQueryResultType"/>
     <xs:element name="QueryRoutesByNameSpec" type="QueryRoutesByNameSpecType"/>
     <xs:element name="DeleteRouteByDistanceSpec" type="DeleteRouteByDistanceSpecType"/>
 
-    <xs:element name="OperationStatusInfo" type="OperationStatusInfoType" />
-    <xs:element name="ErrorInfo" type="ErrorInfoType" />
+    <xs:element name="OperationStatusInfo" type="OperationStatusInfoType"/>
+    <xs:element name="ErrorInfo" type="ErrorInfoType"/>
 
     <!-- ======================================================================================================= -->
 
@@ -21,6 +22,13 @@
         <xs:sequence>
             <xs:element name="Discoverability" type="DiscoverabilityType" minOccurs="0" maxOccurs="1"/>
         </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="RouteServiceType">
+        <xs:complexContent>
+            <xs:extension base="ObjectType">
+            </xs:extension>
+        </xs:complexContent>
     </xs:complexType>
 
     <xs:complexType name="DistanceQueryResultType">
@@ -41,24 +49,24 @@
 
     <xs:complexType name="OperationStatusInfoType">
         <xs:sequence>
-            <xs:element name="Message" type="xs:string" />
+            <xs:element name="Message" type="xs:string"/>
         </xs:sequence>
-        <xs:attribute name="Status" type="OperationStatus" use="required" />
+        <xs:attribute name="Status" type="OperationStatus" use="required"/>
     </xs:complexType>
 
     <xs:simpleType name="OperationStatus">
         <xs:restriction base="xs:string">
-            <xs:enumeration value="Accomplished" />
-            <xs:enumeration value="Denied" />
+            <xs:enumeration value="Accomplished"/>
+            <xs:enumeration value="Denied"/>
         </xs:restriction>
     </xs:simpleType>
 
     <xs:complexType name="ErrorInfoType">
         <xs:sequence>
-            <xs:element name="Message" type="xs:string" />
-            <xs:element name="StackTrace" type="xs:string" />
+            <xs:element name="Message" type="xs:string"/>
+            <xs:element name="StackTrace" type="xs:string"/>
         </xs:sequence>
-        <xs:attribute name="Type" type="xs:string" use="required" />
+        <xs:attribute name="Type" type="xs:string" use="required"/>
     </xs:complexType>
 
     <!-- Region routes -->
@@ -87,10 +95,8 @@
         <xs:complexContent>
             <xs:extension base="ObjectType">
                 <xs:sequence>
-                    <xs:element name="Coordinates" type="CoordinatesType"/>
+                    <xs:group ref="RouteInfoGroup"/>
                     <xs:element name="CreationDate" type="localDate"/>
-                    <xs:element name="From" type="LocationType"/>
-                    <xs:element name="To" type="LocationType"/>
                 </xs:sequence>
                 <xs:attribute name="Id" type="id" use="required"/>
                 <xs:attribute name="Name" type="nonEmptyString" use="required"/>
@@ -98,6 +104,22 @@
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
+
+    <xs:complexType name="RouteCreationSpecType">
+        <xs:sequence>
+            <xs:group ref="RouteInfoGroup"/>
+        </xs:sequence>
+        <xs:attribute name="Name" type="nonEmptyString" use="required"/>
+        <xs:attribute name="Distance" type="distance" use="required"/>
+    </xs:complexType>
+
+    <xs:group name="RouteInfoGroup">
+        <xs:sequence>
+            <xs:element name="Coordinates" type="CoordinatesType"/>
+            <xs:element name="From" type="LocationType"/>
+            <xs:element name="To" type="LocationType"/>
+        </xs:sequence>
+    </xs:group>
 
     <xs:complexType name="LocationType">
         <xs:attribute name="X" type="xs:int" use="required"/>

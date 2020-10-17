@@ -68,10 +68,19 @@ export class RouteInfo {
     return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
     <Route Id="${this.id}" Name="${this.name}" Distance="${this.distance}" xmlns="main.webapp.xml">
         <Coordinates X="${this.coordinates.x}" Y="${this.coordinates.y}"/>
-        <CreationDate Mills="${this.creationDate.valueOf()}"/>
         <From X="${this.from.x}" Y="${this.from.y}" Z="${this.from.z}"/>
         <To X="${this.to.x}" Y="${this.to.y}" Z="${this.to.z}"/>
+        <CreationDate Mills="${this.creationDate.valueOf()}"/>
     </Route>`;
+  }
+
+  public toSpecXml(): string {
+    return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+    <RouteCreationSpec Name="${this.name}" Distance="${this.distance}" xmlns="main.webapp.xml">
+        <Coordinates X="${this.coordinates.x}" Y="${this.coordinates.y}"/>
+        <From X="${this.from.x}" Y="${this.from.y}" Z="${this.from.z}"/>
+        <To X="${this.to.x}" Y="${this.to.y}" Z="${this.to.z}"/>
+    </RouteCreationSpec>`;
   }
 
   public static makeEmptyRoute(): RouteInfo {
@@ -187,7 +196,7 @@ class RouteDataService {
   }
 
   create(data: RouteInfo): Promise<RouteInfo> {
-    return http.post("/routes?action=add", data.toXml())
+    return http.post("/routes?action=add", data.toSpecXml())
                .then((rs) => parseRoute(parseXml(rs.data)))
                .catch(this.handleError);
   }
