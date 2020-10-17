@@ -179,7 +179,7 @@
           {{ currentRoute.to.z }}
         </div>
         <div>
-          <a class="badge badge-warning mb-2 mr-sm-2 mb-sm-0" :href="'/routes/' + currentRoute.id">Edit</a>
+          <router-link class="badge badge-warning mb-2 mr-sm-2 mb-sm-0" :to="{name: 'route-details', params: {id: this.currentRoute.id}}">Edit</router-link>
         </div>
       </div>
       <div v-else>
