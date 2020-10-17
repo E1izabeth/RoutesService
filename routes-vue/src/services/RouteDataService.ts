@@ -209,7 +209,7 @@ class RouteDataService {
   }
 
   getSummaryDst(): Promise<number> {
-    return http.post("/routes?action=get-dst")
+    return http.get("/routes?action=get-dst")
                .then((rs) => {
                   const dom = parseXml(rs.data);
                   const value = xpathString(dom, '/m:DistanceSumQueryResult/@Value');
@@ -219,8 +219,7 @@ class RouteDataService {
   }
 
   getByName(name: string): Promise<RoutesInfo> {
-    var queryNameSpec = `<?xml version="1.0" encoding="UTF-8" ?><QueryRoutesByNameSpec ExactName="${name}" xmlns="main.webapp.xml" />`;
-    return http.post("/routes?action=get-by-name", queryNameSpec)
+    return http.get(`/routes?action=get-by-name&name=${name}`)
                .then((rs) => parseRoutesList(parseXml(rs.data)))
                .catch(this.handleError);
   }

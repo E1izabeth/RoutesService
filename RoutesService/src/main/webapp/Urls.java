@@ -48,6 +48,7 @@ public class Urls {
     public static final String QUERY_ACTION_DELETE_BY_DISTANCE = "del-by-dst";
     public static final String QUERY_ACTION_GET_DISTANCE_SUM = "get-dst";
     public static final String QUERY_ACTION_GET_ROUTES_BY_NAME = "get-by-name";
+    public static final String QUERY_PARAM_NAME = "name";
 
     public static final String QUERY_PARAM_ACTION = "action";
     public static final String QUERY_PARAM_FILTER = "filter";

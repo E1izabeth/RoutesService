@@ -185,9 +185,8 @@ public class RoutesContext implements AutoCloseable{
         this.prepareResponse(_xmlBuilder.translateDistanceQueryResult(value));
     }
 
-    public void getRouteByName() throws Throwable {
-        QueryRoutesByNameSpecType spec = this.parseRequest(QueryRoutesByNameSpecType.class);
-        this.queryRoutes("name contains \"" + spec.getExactName() + "\"", null, null, null);
+    public void getRouteByName(String name) throws Throwable {
+        this.queryRoutes("name contains \"" + name + "\"", null, null, null);
     }
 
     private RouteDbEntity createRouteFromSpec(RouteCreationSpecType spec) {
