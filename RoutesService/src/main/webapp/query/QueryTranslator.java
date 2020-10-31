@@ -75,9 +75,9 @@ public class QueryTranslator {
             public String visitDateTimeFieldRef(SqlExpr.DateTimeFieldRef dateTimeFieldRef) { return this.addFieldRef(dateTimeFieldRef.fieldName); }
 
             public String visitDateTimeToNumberConvOp(SqlExpr.DateTimeToNumberConvOp convOp) {
-                qb.append("cast(extract(epoch from (");
+                qb.append("cast(extract(epoch from (date_trunc('second', ");
                 this.handle(convOp.arg);
-                qb.append(")) as bigint)");
+                qb.append("))) as bigint)");
                 return null;
             }
 
