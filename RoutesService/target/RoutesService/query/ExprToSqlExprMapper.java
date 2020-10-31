@@ -5,6 +5,11 @@ import main.webapp.query.parsing.Expr;
 import main.webapp.query.parsing.IExprVisitor;
 import main.webapp.query.parsing.QueryParsingException;
 
+import java.util.List;
+import java.util.TimeZone;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
 public class ExprToSqlExprMapper implements IExprVisitor<SqlExpr> {
 
     private final QueryFieldsMap _queryFields;
@@ -48,11 +53,43 @@ public class ExprToSqlExprMapper implements IExprVisitor<SqlExpr> {
             case QueryTerms.GreaterOrEqual: {
                 result = this.translateBinary(head.name, apply.args.get(0), apply.args.get(1));
             } break;
-            default:
-                throw new QueryParsingException("Unexpected complex expression kind " + head.name);
+            default: {
+                if (head.name.toLowerCase().equals("time")) {
+                    result = this.translateTimeLiteral(apply);
+                } else {
+                    throw new QueryParsingException("Unexpected complex expression kind " + head.name);
+                }
+            }
         }
 
         return result;
+    }
+
+    private SqlExpr translateTimeLiteral(Expr.Apply apply) {
+        if (apply.args.size() > 7 || apply.args.size() < 1) {
+            throw new QueryParsingException("DateTime spec should be time(year, month, day, hour, minute, second, timeZoneOffsetSeconds)");
+        }
+        // make_timestamptz(year int, month int, day int, hour int, min int, sec double precision, [ timezone text ])
+        // make_timestamptz(2013,     7,         15,      8,        15,      23.5)
+
+        List<SqlExpr> parts = IntStream.range(0, Math.min(6, apply.args.size()))
+                                       .mapToObj(i -> new SqlExpr.NumberToIntegerConvOp(this.translateTo(SqlExpr.Numeric.class, apply.args.get(i))))
+                                       .collect(Collectors.toList());
+        while (parts.size() < 6) {
+            parts.add(new SqlExpr.NumberToIntegerConvOp(new SqlExpr.NumberLiteral(0)));
+        }
+
+        if (apply.args.size() > 6) {
+            SqlExpr.StringLiteral tzspec = this.translateTo(SqlExpr.StringLiteral.class, apply.args.get(6));
+            String zoneName = TimeZone.getTimeZone(tzspec.value).toZoneId().toString();
+            parts.add(new SqlExpr.StringLiteral(zoneName));
+        } else {
+            parts.add(new SqlExpr.StringLiteral("UTC"));
+        }
+
+        return new SqlExpr.DateTimeToNumberConvOp(
+            new SqlExpr.DateTimeFuncCallOp("make_timestamptz", parts)
+        );
     }
 
     private SqlExpr translateUnary(String term, Expr arg) {
@@ -142,6 +179,7 @@ public class ExprToSqlExprMapper implements IExprVisitor<SqlExpr> {
         switch (fieldInfo.type) {
             case String: result = new SqlExpr.StringFieldRef(fieldInfo.sqlViewName); break;
             case Number: result = new SqlExpr.NumericFieldRef(fieldInfo.sqlViewName); break;
+            case DateTime: result = new SqlExpr.DateTimeToNumberConvOp(new SqlExpr.DateTimeFieldRef(fieldInfo.sqlViewName)); break;
             case Bool:
             default:
                 throw new QueryParsingException("Unexpected query field Sql type " + fieldInfo.type.name());

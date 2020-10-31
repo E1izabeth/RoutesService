@@ -10,7 +10,6 @@
     <xs:element name="RoutesQueryResult" type="RoutesQueryResultType"/>
 
     <xs:element name="DistanceSumQueryResult" type="DistanceQueryResultType"/>
-    <xs:element name="QueryRoutesByNameSpec" type="QueryRoutesByNameSpecType"/>
     <xs:element name="DeleteRouteByDistanceSpec" type="DeleteRouteByDistanceSpecType"/>
 
     <xs:element name="OperationStatusInfo" type="OperationStatusInfoType"/>
@@ -37,10 +36,6 @@
                 <xs:attribute name="Value" type="xs:long" use="required"/>
             </xs:extension>
         </xs:complexContent>
-    </xs:complexType>
-
-    <xs:complexType name="QueryRoutesByNameSpecType">
-        <xs:attribute name="ExactName" type="xs:string" use="required"/>
     </xs:complexType>
 
     <xs:complexType name="DeleteRouteByDistanceSpecType">
@@ -133,7 +128,7 @@
         <xs:attribute name="Y" type="coordY" use="required"/>
     </xs:complexType>
 
-    <xs:complexType name="localDate" final="extension restriction">
+    <xs:complexType name="localDate">
         <xs:attribute name="Mills" type="xs:long" use="required"/>
     </xs:complexType>
 

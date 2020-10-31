@@ -12,7 +12,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.xml.bind.JAXBException;
 
 @WebServlet(
     name = "myRouteServlet",
@@ -91,6 +90,10 @@ public class RouteServlet extends HttpServlet {
         }
     }
 
+    private void prepareRoutesRootAllowedMethods(HttpServletResponse resp) {
+        resp.setHeader("Allow", "GET, POST");
+    }
+
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
@@ -100,7 +103,8 @@ public class RouteServlet extends HttpServlet {
                 if (Urls.isWebUrl(path)) {
                     ctx.handleWebRequest(getBaseUrl(req), this.getRequestPath(req));
                 } else if (Urls.isRoutesUrl(path)) {
-                    throw new RestApiException(HttpServletResponse.SC_FORBIDDEN, "Collection itself cannot be deleted");
+                    this.prepareRoutesRootAllowedMethods(resp);
+                    throw new RestApiException(HttpServletResponse.SC_METHOD_NOT_ALLOWED, "Collection itself cannot be deleted");
                 } else {
                     Long id = Urls.parseRouteUrlId(path);
                     if (id != null) {
@@ -125,7 +129,8 @@ public class RouteServlet extends HttpServlet {
                 if (Urls.isWebUrl(path)) {
                     ctx.handleWebRequest(getBaseUrl(req), this.getRequestPath(req));
                 } else if (Urls.isRoutesUrl(path)) {
-                    throw new RestApiException(HttpServletResponse.SC_FORBIDDEN, "Collection itself cannot be updated");
+                    this.prepareRoutesRootAllowedMethods(resp);
+                    throw new RestApiException(HttpServletResponse.SC_METHOD_NOT_ALLOWED, "Collection itself cannot be updated");
                 } else {
                     Long id = Urls.parseRouteUrlId(path);
                     if (id != null) {
@@ -150,18 +155,24 @@ public class RouteServlet extends HttpServlet {
                 } else if (Urls.isRoutesUrl(path)) {
                     String actionStr = request.getParameter(Urls.QUERY_PARAM_ACTION);
                     String nameStr = request.getParameter(Urls.QUERY_PARAM_NAME);
-                    if(actionStr != null){
+                    if (actionStr != null){
                         switch (actionStr) {
                             case Urls.QUERY_ACTION_GET_DISTANCE_SUM: ctx.getDst(); break;
-                            case Urls.QUERY_ACTION_GET_ROUTES_BY_NAME: ctx.getRouteByName(nameStr); break;
+                            case Urls.QUERY_ACTION_GET_ROUTES_BY_NAME: {
+                                if (nameStr == null) {
+                                    throw new RestApiException(HttpServletResponse.SC_BAD_REQUEST, "Invalid request");
+                                } else {
+                                    ctx.getRouteByName(nameStr);
+                                }
+                            } break;
                             default:
                                 throw new RestApiException(HttpServletResponse.SC_BAD_REQUEST, "Invalid action spec");
                         }
-                    }else {
+                    } else {
                         String filterStr = request.getParameter(Urls.QUERY_PARAM_FILTER);
                         String sortStr = request.getParameter(Urls.QUERY_PARAM_SORT);
-                        Long pageSize = Utils.parseMaybeLong(request.getParameter(Urls.QUERY_PARAM_PAGE_SIZE));
-                        Long pageNum = Utils.parseMaybeLong(request.getParameter(Urls.QUERY_PARAM_PAGE_NUM));
+                        Long pageSize = Utils.parseLongOrNothing(request.getParameter(Urls.QUERY_PARAM_PAGE_SIZE));
+                        Long pageNum = Utils.parseLongOrNothing(request.getParameter(Urls.QUERY_PARAM_PAGE_NUM));
                         ctx.queryRoutes(filterStr, sortStr, pageSize, pageNum);
                     }
                 } else {

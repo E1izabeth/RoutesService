@@ -1,5 +1,8 @@
 package main.webapp.query;
 
+import java.util.Date;
+import java.util.List;
+
 public abstract class SqlExpr {
     public final SqlType type;
 
@@ -18,14 +21,22 @@ public abstract class SqlExpr {
             super(SqlType.Number);
         }
     }
+
     public abstract static class Logic extends SqlExpr {
         public Logic() {
             super(SqlType.Bool);
         }
     }
+
     public abstract static class Stringy extends SqlExpr {
         public Stringy() {
             super(SqlType.String);
+        }
+    }
+
+    public abstract static class DateTime extends SqlExpr {
+        public DateTime() {
+            super(SqlType.DateTime);
         }
     }
 
@@ -41,6 +52,7 @@ public abstract class SqlExpr {
             return visitor.visitNumberLiteral(this);
         }
     }
+
     public static class StringLiteral extends Stringy {
         public final String value;
 
@@ -66,6 +78,7 @@ public abstract class SqlExpr {
             return visitor.visitNumericFieldRef(this);
         }
     }
+
     public static class StringFieldRef extends Stringy {
         public final String fieldName;
 
@@ -76,6 +89,19 @@ public abstract class SqlExpr {
         @Override
         protected <TRet> TRet applyImpl(ISqlExprVisitor<TRet> visitor) {
             return visitor.visitStringFieldRef(this);
+        }
+    }
+
+    public static class DateTimeFieldRef extends DateTime {
+        public final String fieldName;
+
+        public DateTimeFieldRef(String fieldName) {
+            this.fieldName = fieldName;
+        }
+
+        @Override
+        protected <TRet> TRet applyImpl(ISqlExprVisitor<TRet> visitor) {
+            return visitor.visitDateTimeFieldRef(this);
         }
     }
 
@@ -94,6 +120,7 @@ public abstract class SqlExpr {
             return visitor.visitNumericMathOp(this);
         }
     }
+
     public static class LogicOp extends Logic {
         public final SqlLogicOp kind;
         public final Logic left, right;
@@ -109,6 +136,7 @@ public abstract class SqlExpr {
             return visitor.visitLogicOp(this);
         }
     }
+
     public static class CompareNumsOp extends Logic {
         public final SqlCompareOp kind;
         public final Numeric left, right;
@@ -124,6 +152,7 @@ public abstract class SqlExpr {
             return visitor.visitCompareNumsOp(this);
         }
     }
+
     public static class LogicNotOp extends Logic {
         public final Logic arg;
 
@@ -136,6 +165,7 @@ public abstract class SqlExpr {
             return visitor.visitLogicNotOp(this);
         }
     }
+
     public static class NumericNegateOp extends Numeric {
         public final Numeric arg;
 
@@ -148,6 +178,7 @@ public abstract class SqlExpr {
             return visitor.visitNumericNegateOp(this);
         }
     }
+
     public static class CompareStringsOp extends Logic {
         public final Stringy left, right;
         public final boolean partial;
@@ -161,6 +192,47 @@ public abstract class SqlExpr {
         @Override
         protected <TRet> TRet applyImpl(ISqlExprVisitor<TRet> visitor) {
             return visitor.visitCompareStringsOp(this);
+        }
+    }
+
+    public static class DateTimeFuncCallOp extends DateTime {
+        public final String name;
+        public final List<SqlExpr> args;
+
+        public DateTimeFuncCallOp(String name, List<SqlExpr> args) {
+            this.name = name;
+            this.args = args;
+        }
+
+        @Override
+        protected <TRet> TRet applyImpl(ISqlExprVisitor<TRet> visitor) {
+            return visitor.visitDateTimeFuncCallOp(this);
+        }
+    }
+
+    public static class DateTimeToNumberConvOp extends Numeric {
+        public final DateTime arg;
+
+        public DateTimeToNumberConvOp(DateTime arg) {
+            this.arg = arg;
+        }
+
+        @Override
+        protected <TRet> TRet applyImpl(ISqlExprVisitor<TRet> visitor) {
+            return visitor.visitDateTimeToNumberConvOp(this);
+        }
+    }
+
+    public static class NumberToIntegerConvOp extends Numeric {
+        public final Numeric arg;
+
+        public NumberToIntegerConvOp(Numeric arg) {
+            this.arg = arg;
+        }
+
+        @Override
+        protected <TRet> TRet applyImpl(ISqlExprVisitor<TRet> visitor) {
+            return visitor.visitNumberToIntegerConvOp(this);
         }
     }
 }

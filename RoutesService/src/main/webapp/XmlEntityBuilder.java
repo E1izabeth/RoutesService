@@ -2,12 +2,10 @@ package main.webapp;
 
 import main.webapp.xml.*;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
-import java.util.stream.Collectors;
 
 public class XmlEntityBuilder {
 
@@ -34,11 +32,11 @@ public class XmlEntityBuilder {
         return obj;
     }
 
-    public RouteType makeRoute(long id, Date creationDate, String name, long distance, CoordinatesType coords, LocationType from, LocationType to, DiscoverabilityType discoverability) {
+    public RouteType makeRoute(long id, LocalDateTime creationDate, String name, long distance, CoordinatesType coords, LocationType from, LocationType to, DiscoverabilityType discoverability) {
         RouteType r = new RouteType();
         r.setCoordinates(coords);
-        r.setCreationDate(new LocalDate() {{
-            setMills(creationDate.getTime());
+        r.setCreationDate(new LocalDate(){{
+            setMills(creationDate.toInstant(ZoneOffset.UTC).toEpochMilli());
         }});
         r.setDistance(distance);
         r.setId(id);
@@ -105,7 +103,7 @@ public class XmlEntityBuilder {
 
     public RouteType translateRouteEntity(RouteDbEntity entity) {
         RouteType r = makeRoute(
-                entity.id, new Date(entity.creationDateMills), entity.name, entity.distance,
+                entity.id, entity.creationDate, entity.name, entity.distance,
                 makeCoordinates(entity.coordX, entity.coordY),
                 makeLocation(entity.fromLocX, entity.fromLocY, entity.fromLocZ),
                 makeLocation(entity.toLocX, entity.toLocY, entity.toLocZ),

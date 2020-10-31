@@ -23,4 +23,8 @@ public class ExprCollector implements IExprVisitor<String> {
     public String visitSymbol(Expr.Symbol symbol) {
         return symbol.name;
     }
+
+    public String visitTimezone(Expr.Characters tzString) {
+        return tzString.text;
+    }
 }

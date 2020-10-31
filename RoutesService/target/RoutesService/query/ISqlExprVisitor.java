@@ -5,6 +5,8 @@ public interface ISqlExprVisitor<TRet> {
 
     TRet visitStringFieldRef(SqlExpr.StringFieldRef stringFieldRef);
 
+    TRet visitDateTimeFieldRef(SqlExpr.DateTimeFieldRef timezoneFieldRef);
+
     TRet visitNumericMathOp(SqlExpr.NumericMathOp mathOp);
 
     TRet visitLogicOp(SqlExpr.LogicOp logicOp);
@@ -20,4 +22,10 @@ public interface ISqlExprVisitor<TRet> {
     TRet visitNumberLiteral(SqlExpr.NumberLiteral numberLiteral);
 
     TRet visitStringLiteral(SqlExpr.StringLiteral stringLiteral);
+
+    TRet visitDateTimeFuncCallOp(SqlExpr.DateTimeFuncCallOp funcCallOp);
+
+    TRet visitDateTimeToNumberConvOp(SqlExpr.DateTimeToNumberConvOp convOp);
+
+    TRet visitNumberToIntegerConvOp(SqlExpr.NumberToIntegerConvOp convOp);
 }

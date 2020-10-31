@@ -5,7 +5,7 @@ public enum TokenKind {
     Symbol,
     String,
     Whitespace,
-    // Comma,
+    Comma,
     // OpenBracket,
     // CloseBracket,
     OpenGroup,

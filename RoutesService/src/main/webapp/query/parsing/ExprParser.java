@@ -76,18 +76,18 @@ public class ExprParser {
         }};
 
         _infixHandlers = new HashMap<TokenKind, Func3<ParsingContext, Integer, Expr, Expr>>() {{
-//            put(TokenKind.OpenBracket, (ctx, bp, left) -> {
-//                ArrayList<Expr> args = new ArrayList<Expr>();
-//                if (ctx.peek().kind != TokenKind.CloseBracket) {
-//                    args.add(ExprParser.this.parseInternal(ctx));
-//                    while (ctx.peek().kind == TokenKind.Comma) {
-//                        ctx.advance();
-//                        args.add(ExprParser.this.parseInternal(ctx));
-//                    }
-//                }
-//                ctx.expectToken(TokenKind.CloseBracket);
-//                return new Expr.Apply(left, args);
-//            });
+            put(TokenKind.OpenGroup, (ctx, bp, left) -> {
+                ArrayList<Expr> args = new ArrayList<Expr>();
+                if (ctx.peek().kind != TokenKind.CloseGroup) {
+                    args.add(ExprParser.this.parseInternal(ctx));
+                    while (ctx.peek().kind == TokenKind.Comma) {
+                        ctx.advance();
+                        args.add(ExprParser.this.parseInternal(ctx));
+                    }
+                }
+                ctx.expectToken(TokenKind.CloseGroup);
+                return new Expr.Apply(left, args);
+            });
             put(TokenKind.OpChar, (ctx, bp, left) -> {
                 Token opToken = ctx.getCurrentToken();
                 Expr right = ExprParser.this.parseInternal(ctx, bp);

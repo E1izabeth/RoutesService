@@ -7,14 +7,14 @@ import main.webapp.query.StringBuilderEx;
 import java.lang.reflect.Field;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 public class DbContext implements AutoCloseable {
+
+    public static final Calendar tzUTC = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
 
     private static final DbTypesMapping _typesMap;
 
@@ -26,6 +26,7 @@ public class DbContext implements AutoCloseable {
             put(long.class, "bigint");
             put(float.class, "real");
             put(double.class, "double precision");
+            put(LocalDateTime.class, "TIMESTAMP WITH TIME ZONE");
         }};
     }
 

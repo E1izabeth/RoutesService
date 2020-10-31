@@ -6,8 +6,13 @@ import org.postgresql.Driver;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.sql.*;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Arrays;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -68,6 +73,16 @@ public class DbConnection implements AutoCloseable {
     }
 
     private PreparedStatement makeDbStatement(String sql, Iterable<DbQueryParameter> args) throws SQLException {
+        Logger log = Logger.getLogger(getClass().getName());
+        log.setLevel(Level.ALL);
+
+        StringBuilderEx sb = new StringBuilderEx();
+        sb.appendLine("Preparing SQL statement: " + sql);
+        for (DbQueryParameter arg : args) {
+            sb.append("\t").append(Integer.toString(arg.index)).append(": [").append(arg.value.getClass().getName()).append("]").appendLine(arg.value.toString());
+        }
+        log.info(sb.toString());
+
         PreparedStatement stmt = _cnn.prepareStatement(sql);
 
         for (DbQueryParameter arg : args) {
@@ -120,6 +135,11 @@ public class DbConnection implements AutoCloseable {
                 stmt.setTime(parameterIndex, (Time) parameterObj);
             } else if (parameterObj instanceof Timestamp) {
                 stmt.setTimestamp(parameterIndex, (Timestamp) parameterObj);
+            } else if (parameterObj instanceof LocalDateTime) {
+                LocalDateTime obj = (LocalDateTime)parameterObj;
+                Instant instant = obj.toInstant(ZoneOffset.UTC);
+                Timestamp timestamp = new Timestamp(instant.toEpochMilli());
+                stmt.setTimestamp(parameterIndex, (Timestamp) timestamp, DbContext.tzUTC);
             } else if (parameterObj instanceof Boolean) {
                 stmt.setBoolean(parameterIndex, ((Boolean) parameterObj).booleanValue());
             } else if (parameterObj instanceof InputStream) {

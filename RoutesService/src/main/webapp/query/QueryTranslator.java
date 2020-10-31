@@ -4,8 +4,6 @@ import main.webapp.RouteDbEntity;
 import main.webapp.db.DbParametrizedQueryBuilder;
 import main.webapp.db.DbParametrizedQueryInfo;
 
-import java.util.ArrayList;
-
 public class QueryTranslator {
 
     private final QueryFieldsMap _fieldsMap;
@@ -25,15 +23,15 @@ public class QueryTranslator {
                 put("name", SqlType.String);
                 put("id", SqlType.Number);
                 put("distance", SqlType.Number);
-                put("created","creationDateMills", SqlType.Number);
+                put("created","creationDate", SqlType.DateTime);
                 put("coordX", SqlType.Number);
                 put("coordY", SqlType.Number);
                 put("fromX","fromLocX", SqlType.Number);
                 put("fromY","fromLocX", SqlType.Number);
                 put("fromZ", "fromLocZ",SqlType.Number);
-                put("toX", "toLocX",SqlType.Number);
-                put("toY", "toLocY",SqlType.Number);
-                put("toZ", "toLocZ",SqlType.Number);
+                put("toX", "toLocX", SqlType.Number);
+                put("toY", "toLocY", SqlType.Number);
+                put("toZ", "toLocZ", SqlType.Number);
             }
         };
 
@@ -74,6 +72,22 @@ public class QueryTranslator {
 
             public String visitNumericFieldRef(SqlExpr.NumericFieldRef numericFieldRef) { return this.addFieldRef(numericFieldRef.fieldName); }
             public String visitStringFieldRef(SqlExpr.StringFieldRef stringFieldRef) { return this.addFieldRef(stringFieldRef.fieldName); }
+            public String visitDateTimeFieldRef(SqlExpr.DateTimeFieldRef dateTimeFieldRef) { return this.addFieldRef(dateTimeFieldRef.fieldName); }
+
+            public String visitDateTimeToNumberConvOp(SqlExpr.DateTimeToNumberConvOp convOp) {
+                qb.append("cast(extract(epoch from (");
+                this.handle(convOp.arg);
+                qb.append(")) as bigint)");
+                return null;
+            }
+
+            public String visitNumberToIntegerConvOp(SqlExpr.NumberToIntegerConvOp convOp) {
+                qb.append("cast((");
+                this.handle(convOp.arg);
+                qb.append(") as int)");
+                return null;
+            }
+
             public String visitNumericMathOp(SqlExpr.NumericMathOp mathOp) { return this.addBinOp(mathOp.left, mathOp.kind.toMathChar(), mathOp.right); }
             public String visitLogicOp(SqlExpr.LogicOp logicOp) { return this.addBinOp(logicOp.left, logicOp.kind.toLogicChar(), logicOp.right); }
             public String visitCompareNumsOp(SqlExpr.CompareNumsOp compareNumsOp) { return this.addBinOp(compareNumsOp.left, compareNumsOp.kind.toCompareChar(), compareNumsOp.right); }
@@ -82,6 +96,21 @@ public class QueryTranslator {
 
             public String visitNumberLiteral(SqlExpr.NumberLiteral numberLiteral) { qb.appendParameter(numberLiteral.value); return null; }
             public String visitStringLiteral(SqlExpr.StringLiteral stringLiteral) { qb.appendParameter(stringLiteral.value); return null; }
+
+            public String visitDateTimeFuncCallOp(SqlExpr.DateTimeFuncCallOp funcCallOp) {
+                qb.append(funcCallOp.name).append("(");
+
+                if (funcCallOp.args.size() > 0) {
+                    this.handle(funcCallOp.args.get(0));
+                    for (int i = 1; i < funcCallOp.args.size(); i++) {
+                        qb.append(", ");
+                        this.handle(funcCallOp.args.get(i));
+                    }
+                }
+
+                qb.append(")");
+                return null;
+            }
 
             public String visitCompareStringsOp(SqlExpr.CompareStringsOp compareStringsOp) {
                 if (compareStringsOp.partial) {

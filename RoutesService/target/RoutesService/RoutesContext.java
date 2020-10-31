@@ -14,6 +14,9 @@ import javax.xml.bind.JAXBException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.logging.Logger;
 import java.util.stream.StreamSupport;
@@ -193,7 +196,7 @@ public class RoutesContext implements AutoCloseable{
         RouteDbEntity obj = new RouteDbEntity();
 
         obj.name = spec.getName();
-        obj.creationDateMills = System.currentTimeMillis();
+        obj.creationDate = LocalDateTime.ofInstant(Instant.ofEpochMilli(System.currentTimeMillis()), DbContext.tzUTC.getTimeZone().toZoneId());
 
         obj.distance = spec.getDistance();
 

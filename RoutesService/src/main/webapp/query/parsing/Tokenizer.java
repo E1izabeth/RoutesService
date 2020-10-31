@@ -39,12 +39,14 @@ public class Tokenizer
         registerUnary(TokenKind.String, "^\"([^\"]|(\\.))*\"", Integer.MIN_VALUE);
 
         registerUtility(TokenKind.Whitespace, "^((\\s+)|(//[^\\n\\r]+[\r\n]))");
-        //registerUtility(TokenKind.Comma, "^\\,");
+        registerUtility(TokenKind.Comma, "^\\,");
 
-        //registerBinary(TokenKind.OpenBracket, "^\\[", 100000, false);
-        registerUnary(TokenKind.OpenGroup, "^\\(", Integer.MAX_VALUE);
+        OpTokenInfo info = new OpTokenInfo(TokenKind.OpenGroup.toString(), null, Pattern.compile("^\\("));
+        info.unaryBindingPower = Integer.MAX_VALUE;
+        info.binaryBindingPower = 100000;
+        info.inverseBinaryAssociativity = false;
+        _builtinPatterns.put(TokenKind.OpenGroup, info);
 
-        //registerUnary(TokenKind.CloseBracket, "^\\]", Integer.MIN_VALUE);
         registerUnary(TokenKind.CloseGroup, "^\\)", Integer.MIN_VALUE);
     }
 
