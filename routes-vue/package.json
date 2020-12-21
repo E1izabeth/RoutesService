@@ -13,6 +13,8 @@
     "axios": "^0.19.2",
     "bootstrap-vue": "^2.17.3",
     "core-js": "^3.6.4",
+    "https": "^1.0.0",
+    "https-agent": "^1.0.0",
     "jquery": "^1.9.1",
     "register-service-worker": "^1.7.1",
     "sass": "^1.27.0",

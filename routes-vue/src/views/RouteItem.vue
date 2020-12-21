@@ -36,7 +36,10 @@
         <label for="coordY">Coordinate Y</label>
         <input class="form-control" id="coordY" required v-model="route.coordinates.y" name="coordY" />
       </div>
-
+      <div class="form-group">
+        <label for="fromLocID">Source location Id</label>
+        <input class="form-control" id="fromLocID" required v-model="route.from.id" name="fromLocId"  />
+      </div>
       <div class="form-group">
         <label for="fromLocX">Source location X</label>
         <input class="form-control" id="fromLocX" required v-model="route.from.x" name="fromLocX" />
@@ -49,7 +52,10 @@
         <label for="fromLocZ">Source location Z</label>
         <input class="form-control" id="fromLocZ" required v-model="route.from.z" name="fromLocZ" />
       </div>
-
+      <div class="form-group">
+        <label for="toLocID">Destination location Id</label>
+        <input class="form-control" id="toLocID" required v-model="route.to.id" name="toLocId" />
+      </div>
       <div class="form-group">
         <label for="toLocX">Destination location X</label>
         <input class="form-control" id="toLocX" required v-model="route.to.x" name="toLocX" />
@@ -81,9 +87,9 @@
 </template>
 
 <script lang="ts">
+import { RouteInfo } from "@/services/DataEntities";
 import { Component, Prop, Vue } from "vue-property-decorator";
 import RouteDataService from "../services/RouteDataService";
-import { RouteInfo } from '../services/RouteDataService';
 
 @Component({
 })

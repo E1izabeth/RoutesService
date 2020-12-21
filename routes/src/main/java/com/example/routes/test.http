@@ -1,0 +1,17 @@
+###
+
+GET http://localhost:8080/routes?action=get_by_name&name="route1"
+Accept: application/xml
+###
+
+GET http://localhost:8080/routes
+Accept: application/xml
+###
+
+
+GET http://localhost:8080/routes?filter=&sort=
+Accept: application/xml
+
+GET http://localhost:8080/web
+Accept: application/xml
+###

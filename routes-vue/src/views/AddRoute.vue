@@ -23,7 +23,7 @@
 
       <div class="form-group">
         <label for="distance">Distance</label>
-        <input type="number" min="2" class="form-control" id="distance" placeholder="long" required v-model="route.distance" name="distance" />
+        <input type="number" min="2" class="form-control" id="distance" placeholder="long > 1" required v-model="route.distance" name="distance" />
       </div>
 
       <div class="form-group">
@@ -72,8 +72,9 @@
 </template>
 
 <script lang="ts">
+import { RouteInfo } from "@/services/DataEntities";
 import { Component, Vue } from "vue-property-decorator";
-import RouteDataService, { Coordinates, Location, RouteInfo } from "../services/RouteDataService";
+import RouteDataService from "../services/RouteDataService";
 
 @Component
 export default class AddRoute extends Vue {
@@ -85,7 +86,9 @@ export default class AddRoute extends Vue {
   private submitted: boolean = false;
 
   saveRoute() {
-    this.route.id = 1;
+    //this.route.id = 1;
+    this.route.from.id = 1;
+    this.route.to.id = 1;
     RouteDataService.create(this.route)
       .then((response) => {
         this.route = response;

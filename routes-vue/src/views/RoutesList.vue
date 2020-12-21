@@ -42,7 +42,7 @@
             <p>sort: id, ~distance</p>
           </b-popover>
         </label>
-        <input id="filter-expr" type="text" class="form-control" placeholder="Filter expression.." v-model="filter"/>
+        <input type="text" class="form-control" placeholder="Filter expression.." v-model="filter"/>
       </b-form-group>
       <b-form inline>
         <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" style="flex: 1;" placeholder="Order by.." v-model="sort"/>
@@ -53,11 +53,11 @@
       <br/>
       <b-form-group label="Special actions">
         <b-form inline>
-          <input id="filter-expr" type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" style="flex: 1;" placeholder="Distance" v-model="distance"/>
+          <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" style="flex: 1;" placeholder="Distance" v-model="distance"/>
           <button class="m-3 btn btn-sm btn-outline-danger" type="button" @click="delOneByDst">Delete one by distance</button>
         </b-form>
         <b-form inline>
-          <input id="filter-expr" type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" style="flex: 1;" placeholder="Name" v-model="exactName"/>
+          <input type="text" class="form-control mb-2 mr-sm-2 mb-sm-0" style="flex: 1;" placeholder="Name" v-model="exactName"/>
           <button class="m-3 btn btn-sm btn-outline-dark" type="button" @click="getByName">Find by name</button>
         </b-form>
       </b-form-group>
@@ -95,7 +95,7 @@
           </ul>
         </nav>
       <ul class="list-group">
-        <li class="list-group-item" :class="{ active: index == currentIndex }" v-for="(route, index) in routes.routes" :key="index" @click="setActiveRoute(route, index)">{{ route.name }}</li>
+        <li class="list-group-item" :class="{ active: index == currentIndex }" v-for="(route, index) in routes.entities" :key="index" @click="setActiveRoute(route, index)">{{ route.name }}</li>
       </ul>
       <div>
         <nav aria-label="Page navigation example">
@@ -155,6 +155,10 @@
           {{ currentRoute.coordinates.y }}
         </div>
         <div>
+          <label><strong>Source location Id:</strong></label>
+          {{ currentRoute.from.id }}
+        </div>
+        <div>
           <label><strong>Source location X:</strong></label>
           {{ currentRoute.from.x }}
         </div>
@@ -165,6 +169,10 @@
         <div>
           <label><strong>Source location Z:</strong></label>
           {{ currentRoute.from.z }}
+        </div>
+        <div>
+          <label><strong>Destination location Id:</strong></label>
+          {{ currentRoute.to.id }}
         </div>
         <div>
           <label><strong>Destination location X:</strong></label>
@@ -192,14 +200,15 @@
 
 <script lang="ts">
 import { Component, Vue } from "vue-property-decorator";
-import RouteDataService, { RouteInfo, RoutesInfo } from "../services/RouteDataService";
+import RouteDataService from "../services/RouteDataService";
+import { RouteInfo, RoutesInfo } from "../services/DataEntities";
 import RouteItem from './RouteItem.vue'
 
 @Component({
   components: { RouteItem }
 })
 export default class RoutesList extends Vue {
-  public routes = new RoutesInfo([], 0, 0, 0, 0);
+  public routes = new RoutesInfo();
   public title = '';
   public currentRoute: RouteInfo|null = null;
   public currentIndex: number = -1;
