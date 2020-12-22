@@ -41,8 +41,8 @@ public class NavigatorController {
 
     final static String _routeSvcRoot = "https://localhost:8586";
 
-    private static String makeQueryUrl(long locFromId, long locToId, String sortKey) {
-        return _routeSvcRoot + "/routes?filter=fromId%3D" + locFromId + "%20and%20toId%3D" + locToId + "&page-size=" + Integer.MAX_VALUE + "&sort=" + sortKey;
+    private static String makeQueryUrl(long locFromId, long locToId, String sortKey, int limit) {
+        return _routeSvcRoot + "/routes?filter=fromId%3D" + locFromId + "%20and%20toId%3D" + locToId + "&page-size=" + limit + "&sort=" + sortKey;
     }
 
     private <R> R invoke(Class<R> resultType, String url) throws IOException, JAXBException, SAXException {
@@ -81,9 +81,20 @@ public class NavigatorController {
         }
     }
 
+    private String makeSortKey(String shortest) {
+        if (shortest.equals("shortest")) {
+            return "distance";
+        } else if (shortest.equals("longest")) {
+            return "~distance";
+        } else {
+            throw new RestApiException(400, "Wrong argument");
+        }
+    }
+
     @GetMapping(path = "/route/{id-from}/{id-to}/{shortest}", produces = MediaType.APPLICATION_XML_VALUE)
     public RoutesQueryResultType getShortestRoute(@PathVariable(name = "id-from") Long id_from, @PathVariable(name = "id-to") Long id_to, @PathVariable(name = "shortest") String shortest) throws Throwable {
-        RoutesQueryResultType allRoutes = invoke(RoutesQueryResultType.class, makeQueryUrl(id_from, id_to, "distance"));
+
+        RoutesQueryResultType allRoutes = invoke(RoutesQueryResultType.class, this.makeQueryUrl(id_from, id_to, this.makeSortKey(shortest), 1));
         List<RouteType> routes = allRoutes.getRoutes().getRoute();
 
         RoutesQueryResultType result = new RoutesQueryResultType();
@@ -91,13 +102,6 @@ public class NavigatorController {
         result.setRoutes(resultRoutes);
 
         if (routes.size() > 0) {
-            if (shortest.equals("shortest")) {
-                resultRoutes.getRoute().add(routes.get(0));
-            } else if (shortest.equals("longest")) {
-                resultRoutes.getRoute().add(routes.get(routes.size() - 1));
-            } else {
-                throw new RestApiException(400, "Wrong argument");
-            }
             result.setPageNumber(0);
             result.setPagesCount(1);
             result.setPageSize(1);
@@ -118,7 +122,7 @@ public class NavigatorController {
         if (order_by == null || order_by.trim().length() == 0)
             throw new RestApiException(HttpServletResponse.SC_BAD_REQUEST, "Missing order-by spec2");
 
-        RoutesQueryResultType allRoutes = invoke(RoutesQueryResultType.class, makeQueryUrl(id_from, id_to, order_by));
+        RoutesQueryResultType allRoutes = invoke(RoutesQueryResultType.class, makeQueryUrl(id_from, id_to, order_by, Integer.MAX_VALUE));
 
         long resultsCount = allRoutes.getRoutes().getRoute().size();
         RoutesQueryResultType result = new RoutesQueryResultType();
