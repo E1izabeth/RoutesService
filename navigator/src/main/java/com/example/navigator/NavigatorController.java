@@ -34,12 +34,13 @@ public class NavigatorController {
 
     */
 
+    final static String _routeSvcRoot = System.getenv("NAV_ROUTE_SVC_ROOT"); // = "https://localhost:8586";
+
     public NavigatorController() {
         Logger log = Logger.getLogger(getClass().getName());
-        log.severe(getClass().getName() + " INSNTANTIATED");
+        log.severe(getClass().getName() + " INSTANTIATED");
+        log.warning("NAV_ROUTE_SVC_ROOT = " + _routeSvcRoot);
     }
-
-    final static String _routeSvcRoot = "https://localhost:8586";
 
     private static String makeQueryUrl(long locFromId, long locToId, String sortKey, int limit) {
         return _routeSvcRoot + "/routes?filter=fromId%3D" + locFromId + "%20and%20toId%3D" + locToId + "&page-size=" + limit + "&sort=" + sortKey;
@@ -97,24 +98,21 @@ public class NavigatorController {
         RoutesQueryResultType allRoutes = invoke(RoutesQueryResultType.class, this.makeQueryUrl(id_from, id_to, this.makeSortKey(shortest), 1));
         List<RouteType> routes = allRoutes.getRoutes().getRoute();
 
-        RoutesQueryResultType result = new RoutesQueryResultType();
-        RoutesListType resultRoutes = new RoutesListType();
-        result.setRoutes(resultRoutes);
-
         if (routes.size() > 0) {
+            RoutesListType resultRoutes = new RoutesListType();
+            resultRoutes.getRoute().add(routes.get(0));
+
+            RoutesQueryResultType result = new RoutesQueryResultType();
+            result.setRoutes(resultRoutes);
             result.setPageNumber(0);
             result.setPagesCount(1);
             result.setPageSize(1);
             result.setTotalCount(1);
-        } else {
-            resultRoutes.getRoute();
-            result.setPageNumber(0);
-            result.setPagesCount(0);
-            result.setPageSize(0);
-            result.setTotalCount(0);
-        }
 
-        return result;
+            return result;
+        } else {
+            throw new RestApiException(HttpServletResponse.SC_NOT_FOUND, "No such routes");
+        }
     }
 
     @GetMapping(path = "/routes/{id-from}/{id-to}/{order-by}", produces = MediaType.APPLICATION_XML_VALUE)
@@ -124,14 +122,17 @@ public class NavigatorController {
 
         RoutesQueryResultType allRoutes = invoke(RoutesQueryResultType.class, makeQueryUrl(id_from, id_to, order_by, Integer.MAX_VALUE));
 
-        long resultsCount = allRoutes.getRoutes().getRoute().size();
-        RoutesQueryResultType result = new RoutesQueryResultType();
-        result.setRoutes(allRoutes.getRoutes());
-        result.setPageNumber(1);
-        result.setPagesCount(1);
-        result.setPageSize(resultsCount);
-        result.setTotalCount(resultsCount);
-
-        return result;
+        if (allRoutes.getTotalCount() > 0) {
+            long resultsCount = allRoutes.getRoutes().getRoute().size();
+            RoutesQueryResultType result = new RoutesQueryResultType();
+            result.setRoutes(allRoutes.getRoutes());
+            result.setPageNumber(0);
+            result.setPagesCount(1);
+            result.setPageSize(resultsCount);
+            result.setTotalCount(resultsCount);
+            return result;
+        } else {
+            throw new RestApiException(HttpServletResponse.SC_NOT_FOUND, "No such routes");
+        }
     }
 }

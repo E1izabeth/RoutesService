@@ -16,7 +16,7 @@ public class CorsInterceptor extends HandlerInterceptorAdapter {
 
     public CorsInterceptor() {
         Logger log = Logger.getLogger(getClass().getName());
-        log.severe(getClass().getName() + " INSNTANTIATED");
+        log.severe(getClass().getName() + " INSTANTIATED");
     }
 
     @Override

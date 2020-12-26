@@ -13,7 +13,7 @@ public class QueryTranslator<T> {
 
     private final QueryFieldsMap _fieldsMap;
     private final QueryParser _queryParser;
-    private final String _sqlViewName;
+    // private final String _sqlViewName;
 
     private final int _defaultPageSize = 20;
 
@@ -28,17 +28,17 @@ public class QueryTranslator<T> {
                 put("name", SqlType.String);
                 put("id", SqlType.Number);
                 put("distance", SqlType.Number);
-                put("created","creation_date", SqlType.DateTime);
-                put("coordX", "coordx", SqlType.Number);
-                put("coordY", "coordy", SqlType.Number);
-                put("fromId","from_location_id", SqlType.Number);
-                put("toId","to_location_id", SqlType.Number);
-                put("fromX","from_x", SqlType.Number);
-                put("fromY","from_y", SqlType.Number);
-                put("fromZ", "from_z",SqlType.Number);
-                put("toX", "to_x", SqlType.Number);
-                put("toY", "to_y", SqlType.Number);
-                put("toZ", "to_z", SqlType.Number);
+                put("created","creationDate", SqlType.DateTime);
+                put("coordX", "coordX", SqlType.Number);
+                put("coordY", "coordX", SqlType.Number);
+                put("fromId","fromLocationId", SqlType.Number);
+                put("toId","toLocationId", SqlType.Number);
+                put("fromX","fromX", SqlType.Number);
+                put("fromY","fromY", SqlType.Number);
+                put("fromZ", "fromZ",SqlType.Number);
+                put("toX", "toX", SqlType.Number);
+                put("toY", "toY", SqlType.Number);
+                put("toZ", "toZ", SqlType.Number);
 
                 put("x", SqlType.Number);
                 put("y", SqlType.Number);
@@ -46,7 +46,7 @@ public class QueryTranslator<T> {
             }
         };
 
-        _sqlViewName = RouteDbEntity.class.getSimpleName();
+        //_sqlViewName = RouteDbEntity.class.getSimpleName();
 
         _queryParser = new QueryParser(_fieldsMap);
     }
@@ -71,9 +71,13 @@ public class QueryTranslator<T> {
                 return builder.build(arg.apply(this));
             }
 
-            public Expression visitNumericFieldRef(SqlExpr.NumericFieldRef numericFieldRef) { return entity.get(numericFieldRef.fieldName); }
-            public Expression visitStringFieldRef(SqlExpr.StringFieldRef stringFieldRef) { return entity.get(stringFieldRef.fieldName); }
-            public Expression visitDateTimeFieldRef(SqlExpr.DateTimeFieldRef dateTimeFieldRef) { return entity.get(dateTimeFieldRef.fieldName); }
+            private Path getField(String fieldName) {
+                return entity.get(fieldName);
+            }
+
+            public Expression visitNumericFieldRef(SqlExpr.NumericFieldRef numericFieldRef) { return this.getField(numericFieldRef.fieldName); }
+            public Expression visitStringFieldRef(SqlExpr.StringFieldRef stringFieldRef) { return this.getField(stringFieldRef.fieldName); }
+            public Expression visitDateTimeFieldRef(SqlExpr.DateTimeFieldRef dateTimeFieldRef) { return this.getField(dateTimeFieldRef.fieldName); }
 
             public Expression visitNumberToIntegerConvOp(SqlExpr.NumberToIntegerConvOp convOp) {
 //                qb.append("cast((");

@@ -16,7 +16,7 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
 
     public ExceptionHandlerFilter() {
         Logger log = Logger.getLogger(getClass().getName());
-        log.severe(getClass().getName() + " INSNTANTIATED");
+        log.severe(getClass().getName() + " INSTANTIATED");
     }
 
     @Override

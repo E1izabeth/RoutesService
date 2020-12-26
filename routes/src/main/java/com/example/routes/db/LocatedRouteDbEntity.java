@@ -31,16 +31,24 @@ public class LocatedRouteDbEntity implements IRouteDbEntity {
     @JoinColumn(name = "to_id", referencedColumnName = "id")
     public LocationDbEntity ToLocation;
 
-    public long from_location_id;
-    public long to_location_id;
+    @Column(name="from_location_id")
+    public long fromLocationId;
+    @Column(name="to_location_id")
+    public long toLocationId;
 
-    public int from_x;
-    public int from_y;
-    public float from_z;
+    @Column(name="from_x")
+    public int fromX;
+    @Column(name="from_y")
+    public int fromY;
+    @Column(name="from_z")
+    public float fromZ;
 
-    public int to_x;
-    public int to_y;
-    public float to_z;
+    @Column(name="to_x")
+    public int toX;
+    @Column(name="to_y")
+    public int toY;
+    @Column(name="to_z")
+    public float toZ;
 
     @Override
     @org.springframework.data.annotation.Transient

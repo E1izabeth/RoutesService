@@ -16,7 +16,7 @@ public class MySecurityConfigurationAdapter extends WebSecurityConfigurerAdapter
 
     public MySecurityConfigurationAdapter() {
         Logger log = Logger.getLogger(getClass().getName());
-        log.severe(getClass().getName() + " INSNTANTIATED");
+        log.severe(getClass().getName() + " INSTANTIATED");
     }
 
     @Override

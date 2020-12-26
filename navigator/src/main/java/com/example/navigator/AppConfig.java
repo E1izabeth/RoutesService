@@ -30,7 +30,7 @@ public class AppConfig implements WebMvcConfigurer {
 
     public AppConfig() {
         Logger log = Logger.getLogger(getClass().getName());
-        log.severe(getClass().getName() + " INSNTANTIATED");
+        log.severe(getClass().getName() + " INSTANTIATED");
 
         // Create a trust manager that does not validate certificate chains
         TrustManager[] trustAllCerts = new TrustManager[] {
