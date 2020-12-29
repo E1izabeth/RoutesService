@@ -34,19 +34,21 @@ public class NavigatorController {
 
     */
 
-    final static String _routeSvcRoot = System.getenv("NAV_ROUTE_SVC_ROOT"); // = "https://localhost:8586";
+    final String _routeSvcRoot = System.getenv("NAV_ROUTE_SVC_ROOT"); // = "https://localhost:8586";
+    final Logger _log;
 
     public NavigatorController() {
-        Logger log = Logger.getLogger(getClass().getName());
-        log.severe(getClass().getName() + " INSTANTIATED");
-        log.warning("NAV_ROUTE_SVC_ROOT = " + _routeSvcRoot);
+        _log = Logger.getLogger(getClass().getName());
+        _log.severe(getClass().getName() + " INSTANTIATED");
+        _log.warning("NAV_ROUTE_SVC_ROOT = " + _routeSvcRoot);
     }
 
-    private static String makeQueryUrl(long locFromId, long locToId, String sortKey, int limit) {
+    private String makeQueryUrl(long locFromId, long locToId, String sortKey, int limit) {
         return _routeSvcRoot + "/routes?filter=fromId%3D" + locFromId + "%20and%20toId%3D" + locToId + "&page-size=" + limit + "&sort=" + sortKey;
     }
 
     private <R> R invoke(Class<R> resultType, String url) throws IOException, JAXBException, SAXException {
+        _log.warning("Submitting request to " + url);
 
         URL target = new URL(url);
         HttpURLConnection connection = (HttpURLConnection)target.openConnection();
@@ -62,14 +64,15 @@ public class NavigatorController {
             reader = connection.getErrorStream();
         }
 
+        String resultString = Utils.readAsStringTillEnd(reader);
         MySerializer serializer = new MySerializer();
 
+        _log.warning("Response is of code " + responseCode + ": \r\n" + resultString);
+
         if (responseCode == 200) {
-            R result = serializer.deserialize(resultType, new InputStreamReader(reader));
+            R result = serializer.deserialize(resultType, new StringReader(resultString));
             return result;
         } else {
-            String resultString = Utils.readAsStringTillEnd(reader);
-
             ErrorInfoType errorInfo;
             try { errorInfo = serializer.deserialize(ErrorInfoType.class, new StringReader(resultString)); }
             catch (Throwable ex) { errorInfo = null; }

@@ -1,0 +1,85 @@
+##server.port=50300
+##eureka.client.register-with-eureka=false
+##eureka.client.fetch-registry=false
+##eureka.client.serviceUrl.defaultZone=http://localhost:50300/eureka
+#logging.level.com.netflix.eureka=info
+#logging.level.com.netflix.discovery=info
+#  #eureka.server.wait-time-in-ms-when-sync-empty=0
+#eureka.server.enable-self-preservation=false
+##eureka.instance.hostname=localhost
+#eureka.server.renewal-percent-threshold=0.5
+
+---
+# This default profile is used when running a single instance completely standalone:
+spring:
+  profiles: default
+server:
+  port: 50100
+eureka:
+  instance:
+    hostname: localhost
+    nonSecurePortEnabled: false
+    securePortEnabled: true
+  client:
+    registerWithEureka: false
+    fetchRegistry: false
+    serviceUrl:
+      defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka
+
+  # united-states, france, and vietnam illustrate running 3 intercommunicating instances.
+  # This example has them running side-by-side on localhost
+  # -- which is unrealistic in production
+  # -- but does illustrate how multiple instances collaborate.
+  #
+  # Run by opening 3 separate command prompts:
+  # java -jar -Dspring.profiles.active=united-states SpringCloudServiceRegistrationEurekaServer.jar
+  # java -jar -Dspring.profiles.active=france SpringCloudServiceRegistrationEurekaServer.jar
+  # java -jar -Dspring.profiles.active=vietnam SpringCloudServiceRegistrationEurekaServer.jar
+#
+#---
+#spring:
+#  profiles: united-states
+#  application:
+#    name: eureka-server-clustered   # ==> This is Service-Id
+#server:
+#  port: 50100
+#eureka:
+#  instance:
+#    hostname: localhost
+#  client:
+#    registerWithEureka: true
+#    fetchRegistry: true
+#    serviceUrl:
+#      defaultZone: http://localhost:50200,http://localhost.com:50300
+#
+#---
+#spring:
+#  profiles: france
+#  application:
+#    name: eureka-server-clustered   # ==> This is Service-Id
+#server:
+#  port: 50200
+#eureka:
+#  instance:
+#    hostname: my-eureka-server-fr.com
+#  client:
+#    registerWithEureka: true
+#    fetchRegistry: true
+#    serviceUrl:
+#      defaultZone: http://localhost:50100,http://localhost:50300
+#
+#---
+#spring:
+#  profiles: vietnam
+#  application:
+#    name: eureka-server-clustered    # ==> This is Service-Id
+#server:
+#  port: 50300
+#eureka:
+#  instance:
+#    hostname: my-eureka-server-vn.com
+#  client:
+#    registerWithEureka: true
+#    fetchRegistry: true
+#    serviceUrl:
+#      defaultZone: http://localhost:50100,http://localhost:50200

@@ -14,6 +14,7 @@ import java.sql.SQLException;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Optional;
 import java.util.TimeZone;
 
@@ -122,9 +123,9 @@ public class RoutesDao extends MyDao {
     public OperationStatusInfoType delRouteByDst(DeleteRouteByDistanceSpecType spec) throws Throwable {
         OperationStatusInfoType result = new OperationStatusInfoType();
 
-        Optional<RouteDbEntity> maybeRoute = _routes.findByDistance(spec.getExactDistance());
-        if (maybeRoute.isPresent()) {
-            _routes.delete(maybeRoute.get());
+        List<RouteDbEntity> someRoutes = _routes.findByDistance(spec.getExactDistance());
+        if (someRoutes.size() > 0) {
+            _routes.delete(someRoutes.get(0));
             result.setMessage("Some route deleted");
             result.setStatus(OperationStatus.ACCOMPLISHED);
         } else {

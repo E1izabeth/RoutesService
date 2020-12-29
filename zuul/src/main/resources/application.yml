@@ -1,0 +1,17 @@
+server:
+  ssl:
+    enabled: true
+    key-store: classpath:server.jks
+    key-store-password: ssssss
+#    key-alias: soa-tester
+    keyStoreType: JKS
+    key-password: ssssss
+
+eureka:
+  instance:
+    nonSecurePortEnabled: false
+    securePortEnabled: true
+    securePort: ${server.port}
+
+#ribbon:
+#  IsSecure: true

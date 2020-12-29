@@ -161,16 +161,17 @@ public class QueryTranslator<T> {
             String[] parts = orderSpecText.split(",");
 
             for (String fieldSpec : parts) {
-                if (fieldSpec.trim().length() == 0)
+                fieldSpec = fieldSpec.trim();
+                if (fieldSpec.length() == 0)
                     continue;
 
                 boolean asc = true;
-                if (fieldSpec.trim().startsWith("~")) {
+                if (fieldSpec.startsWith("~")) {
                     fieldSpec = fieldSpec.substring(1);
                     asc = false;
                 }
 
-                QueryFieldInfo fieldInfo = _fieldsMap.get(fieldSpec.trim());
+                QueryFieldInfo fieldInfo = _fieldsMap.get(fieldSpec);
                 if (asc) {
                     orderList.add(Sort.Order.asc(fieldInfo.sqlViewName));
                 } else {

@@ -178,9 +178,9 @@ public class XmlEntityBuilder {
         ArrayList<LinkType> links = new ArrayList<>();
 
         if (back)
-            links.add(this.makeLink(null, null, LinkRelationType.BACKWARD, _urls.forRoutes(filter, sort, pageSize, pageNum - 1), null));
+            links.add(this.makeLink(null, "Previous page", LinkRelationType.BACKWARD, _urls.forRoutes(filter, sort, pageSize, pageNum - 1), "RoutesQueryResult"));
         if (fwd)
-            links.add(this.makeLink(null, null, LinkRelationType.FORWARD, _urls.forRoutes(filter, sort, pageSize, pageNum + 1), null));
+            links.add(this.makeLink(null, "Next page", LinkRelationType.FORWARD, _urls.forRoutes(filter, sort, pageSize, pageNum + 1), "RoutesQueryResult"));
 
         return this.makeDiscoverability(
             this.makeLinksList(links.toArray(new LinkType[0])),
@@ -211,9 +211,9 @@ public class XmlEntityBuilder {
         ArrayList<LinkType> links = new ArrayList<>();
 
         if (back)
-            links.add(this.makeLink(null, null, LinkRelationType.BACKWARD, _urls.forLocations(filter, sort, pageSize, pageNum - 1), null));
+            links.add(this.makeLink(null, "Previous page", LinkRelationType.BACKWARD, _urls.forLocations(filter, sort, pageSize, pageNum - 1), "LocationsQueryResult"));
         if (fwd)
-            links.add(this.makeLink(null, null, LinkRelationType.FORWARD, _urls.forLocations(filter, sort, pageSize, pageNum + 1), null));
+            links.add(this.makeLink(null, "Next page", LinkRelationType.FORWARD, _urls.forLocations(filter, sort, pageSize, pageNum + 1), "LocationsQueryResult"));
 
         return this.makeDiscoverability(
                 this.makeLinksList(links.toArray(new LinkType[0])),

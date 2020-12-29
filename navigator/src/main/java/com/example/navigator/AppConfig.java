@@ -24,7 +24,7 @@ import java.util.logging.Logger;
 
 @EnableWebMvc
 @Configuration
-@ComponentScan("com.example.routes")
+@ComponentScan("com.example.navigator")
 @EnableAutoConfiguration
 public class AppConfig implements WebMvcConfigurer {
 
