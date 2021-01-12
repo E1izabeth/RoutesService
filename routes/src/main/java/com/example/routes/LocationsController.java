@@ -3,16 +3,16 @@ package com.example.routes;
 
 import com.example.routes.xml.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.context.config.annotation.RefreshScope;
+// import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 
 // @CrossOrigin(allowCredentials = "true", origins = "http://localhost:8081", allowedHeaders = "*")
-@Component
-@RefreshScope
-@RestController
-@RequestMapping("")
+//@Component
+// @RefreshScope
+//@RestController
+//@RequestMapping("")
 public class LocationsController {
     /*
 
@@ -27,12 +27,6 @@ public class LocationsController {
 
     @Autowired
     public LocationsDao locationsDao;
-
-//    @GetMapping(path = Urls.WEB_CHILDREN, produces = MediaType.APPLICATION_XML_VALUE)
-//    public RoutesQueryResultType getWeb(@RequestParam(required = false) String filter, @RequestParam(required = false) String sort, @RequestParam(required = false) Long page_size, @RequestParam(required = false) Long page_num) throws Throwable {
-//        // TODO
-//        throw new RuntimeException();
-//    }
 
     @GetMapping(path = Urls.LOCATIONS_ROOT, produces = MediaType.APPLICATION_XML_VALUE)
     public LocationsQueryResultType getLocations(@RequestParam(required = false) String filter, @RequestParam(required = false) String sort, @RequestParam(required = false, name="page-size") Integer page_size, @RequestParam(required = false, name="page-num") Integer page_num) throws Throwable {

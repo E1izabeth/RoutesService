@@ -3,7 +3,7 @@ package com.example.routes;
 
 import com.example.routes.xml.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.context.config.annotation.RefreshScope;
+// import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
@@ -12,10 +12,10 @@ import javax.xml.bind.JAXBElement;
 import java.sql.SQLException;
 
 // @CrossOrigin(allowCredentials = "true", origins = "http://localhost:8081", allowedHeaders = "*")
-@Component
-@RefreshScope
-@RestController
-@RequestMapping("")
+//@Component
+// @RefreshScope
+//@RestController
+//@RequestMapping("")
 public class RoutesController {
     /*
 

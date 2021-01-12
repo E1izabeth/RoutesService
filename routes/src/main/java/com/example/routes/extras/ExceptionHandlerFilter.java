@@ -4,7 +4,6 @@ import com.example.routes.MySerializer;
 import com.example.routes.RestApiException;
 import com.example.routes.Utils;
 import com.example.routes.xml.ErrorInfoType;
-import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:mulexml="http://www.mulesoft.org/schema/mule/xml" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:spring="http://www.springframework.org/schema/beans" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:core="http://www.mulesoft.org/schema/mule/core" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd">
+    <http:listener-config name="HttpListenerConfig" host="0.0.0.0" port="9191" doc:name="HTTP Listener Configuration"/>
+    <http:request-config name="HttpConnectionConfig" host="127.0.0.1" port="8787" basePath="/ws/" doc:name="HTTP Request Configuration"/>
+    <flow name="api-main">
+        <http:listener config-ref="HttpListenerConfig" path="*" doc:name="HttpListener"/>
+        <set-variable variableName="req" value="#[message]" doc:name="req=#[message]"/>
+        <logger message="#[message.inboundProperties.'http.request.path']" level="INFO" doc:name="Logger"/>
+        <choice doc:name="Choice">
+            <when expression="#[(message.inboundProperties.'http.request.path'=='/routes-service')||(message.inboundProperties.'http.request.path'=='/locations-service')]">
+                <set-variable variableName="cnn" value="#[(message.inboundProperties.'http.request.path').replace(&quot;-service&quot;, &quot;&quot;)]" doc:name="to service endpoint"/>
+            </when>
+			<when expression="#[(message.inboundProperties.'http.request.path'=='/routes.wsdl')||(message.inboundProperties.'http.request.path'=='/locations.wsdl')]">
+				<set-variable variableName="cnn" value="#[(message.inboundProperties.'http.request.path').replace(&quot;.wsdl&quot;, &quot;Svc.wsdl&quot;)]" doc:name="to wsdl"/>
+			</when>
+            <otherwise>
+                <set-variable variableName="cnn" value="#['']" doc:name="cnn=''"/>
+            </otherwise>
+        </choice>
+        <choice doc:name="Choice">
+            <when expression="#[flowVars.cnn=='']">
+                <set-payload value="#['Its nothing to do here for you']" doc:name="Set Response Payload"/>
+                <message-properties-transformer doc:name="Properties for Response">
+                    <add-message-property key="http.status" value="403"/>
+                    <add-message-property key="http.reason" value="Forbidden"/>
+                </message-properties-transformer>
+            </when>
+            <otherwise>
+                <set-payload value="#[payload]" doc:name="Set Payload"/>
+                <http:request config-ref="HttpConnectionConfig" path="#[flowVars.cnn]" method="#[req.inboundProperties.'http.method']" doc:name="HttpConnection"/>
+				<choice doc:name="Choice">
+					<when expression="#[flowVars.cnn.endsWith(&quot;.wsdl&quot;)]">
+						<mulexml:xslt-transformer maxIdleTransformers="2" maxActiveTransformers="5" doc:name="fixup service binding address">
+							<mulexml:xslt-text>
+
+<xsl:stylesheet version="1.0" exclude-result-prefixes="msxsl"
+                xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                xmlns:msxsl="urn:schemas-microsoft-com:xslt"
+                xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+                xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
+
+  <xsl:output method="xml" indent="yes"/>
+
+  <xsl:template match="*[not(comment() | processing-instruction() | *)][normalize-space(text()) = '']">
+    <xsl:element name="{name()}" namespace="{namespace-uri()}">
+      <xsl:for-each select="@* | namespace::*">
+        <xsl:copy/>
+      </xsl:for-each>
+    </xsl:element>
+  </xsl:template>
+
+  <xsl:template match="@* | node()">
+    <xsl:copy>
+      <xsl:apply-templates select="@* | node()"/>
+    </xsl:copy>
+  </xsl:template>
+
+  <xsl:template match="soap:address[@location='http://127.0.0.1:8787/ws/locations']" priority="5">
+    <soap:address location="http://127.0.0.1:9191/locations-service"/>
+  </xsl:template>
+
+  <xsl:template match="soap:address[@location='http://127.0.0.1:8787/ws/routes']" priority="5">
+    <soap:address location="http://127.0.0.1:9191/routes-service"/>
+  </xsl:template>
+
+</xsl:stylesheet>
+							</mulexml:xslt-text>
+						</mulexml:xslt-transformer>
+						<set-payload value="#[payload]" doc:name="Set Payload"/>
+					</when>
+					<otherwise>
+						<set-payload value="#[payload]" doc:name="Set Payload"/>
+					</otherwise>
+				</choice>
+            </otherwise>
+        </choice>
+    </flow>
+</mule>

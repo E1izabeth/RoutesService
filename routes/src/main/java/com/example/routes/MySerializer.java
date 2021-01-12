@@ -1,10 +1,7 @@
 package com.example.routes;
 
-import com.example.routes.extras.MyHttpMessageConverter;
 import com.example.routes.query.StringBuilderEx;
 import com.example.routes.xml.ObjectFactory;
-import org.springframework.context.annotation.Bean;
-import org.springframework.http.converter.HttpMessageConverter;
 import org.xml.sax.SAXException;
 
 import javax.servlet.http.HttpServletResponse;
@@ -30,23 +27,37 @@ public class MySerializer {
     //
 
 
-    private Serializable wrapWithJaxbElement(Object obj) throws InvocationTargetException, IllegalAccessException {
-        Class type = obj.getClass();
+    public static <T> JAXBElement<T> wrapWithJaxbElement(T obj) throws InvocationTargetException, IllegalAccessException {
+        return (JAXBElement<T>)wrapWithJaxbElementImpl(obj);
+    }
+
+    public static List<Method> findXmlTypeRootWrappers(Class type) {
         List<Method> methods = Arrays.stream(ObjectFactory.class.getMethods())
                 .filter(m -> m.getParameterCount() == 1 && m.getParameterTypes()[0] == type && JAXBElement.class.isAssignableFrom(m.getReturnType()))
                 .collect(Collectors.toList());
 
+        return methods;
+    }
+
+    public static Method getXmlTypeRootWrapper(Class type) {
+        List<Method> methods = findXmlTypeRootWrappers(type);
         if (methods.size() != 1)
             throw new RuntimeException("Unable to find corresponding root element info against " + type.getTypeName());
 
-        return (Serializable) methods.get(0).invoke(new ObjectFactory(), obj);
+        return methods.get(0);
+    }
+
+    private static Serializable wrapWithJaxbElementImpl(Object obj) throws InvocationTargetException, IllegalAccessException {
+        Class type = obj.getClass();
+        Method wrapper = getXmlTypeRootWrapper(type);
+        return (Serializable) wrapper.invoke(new ObjectFactory(), obj);
     }
 
     public void serialize(Object obj, Writer writer) throws JAXBException, InvocationTargetException, IllegalAccessException {
         JAXBContext jaxbContext = JAXBContext.newInstance(obj.getClass());
         Marshaller marshaller = jaxbContext.createMarshaller();
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-        marshaller.marshal(this.wrapWithJaxbElement(obj), writer);
+        marshaller.marshal(this.wrapWithJaxbElementImpl(obj), writer);
     }
 
     public <T> T deserialize(Class<T> type, Reader reader) throws JAXBException, SAXException {
