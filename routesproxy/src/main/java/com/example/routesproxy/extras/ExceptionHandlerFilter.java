@@ -3,6 +3,7 @@ package com.example.routesproxy.extras;
 import com.example.routesproxy.MySerializer;
 import com.example.routesproxy.RestApiException;
 import com.example.routesproxy.Utils;
+import com.sun.xml.ws.fault.ServerSOAPFaultException;
 import xml.webapp.main.ErrorInfoType;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -10,6 +11,7 @@ import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.soap.SOAPFault;
 import java.io.*;
 import java.util.logging.Logger;
 
@@ -42,6 +44,13 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
             RestApiException apiEx = Utils.is(RestApiException.class, cause, null);
             if (apiEx != null) {
                 resp.setStatus(apiEx.statusCode);
+                break;
+            }
+            ServerSOAPFaultException soapEx = Utils.is(ServerSOAPFaultException.class, cause, null);
+            if (soapEx != null) {
+                SOAPFault fault = soapEx.getFault();
+                errorInfo.setMessage(fault != null ? fault.getFaultString() : soapEx.getMessage());
+                resp.setStatus(502);
                 break;
             }
             cause = cause.getCause();

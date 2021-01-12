@@ -78,5 +78,8 @@ http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/
 				</choice>
             </otherwise>
         </choice>
+		<catch-exception-strategy doc:name="Catch Exception Strategy">
+			<set-payload value="#[payload]" doc:name="Set Payload"/>
+		</catch-exception-strategy>
     </flow>
 </mule>
