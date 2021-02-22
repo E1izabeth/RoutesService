@@ -97,15 +97,15 @@ routes-vue – фронт
 
 ## Комментарии
 
-routes-vue – фронт
-RoutesService - сервис из 1 лабораторной работы на сервлетах
-navigator – вызывающий сервис (порт 8687,8689)
-routes – вызываемый сервис (порт 8586)
-config-server - ConfigServer (порт 50302)
-eureka-server - Eureka (порт 50100)
-zuul - Zuul + Ribbon (порт 50301)
-/home/s243891/ss3/config - локальный  репозиторий для централизованного хранения файлов конфигурации
-Фронт раздаётся на https://se.ifmo.ru/~s243891/
+routes-vue – фронт  
+RoutesService - сервис из 1 лабораторной работы на сервлетах  
+navigator – вызывающий сервис (порт 8687,8689)  
+routes – вызываемый сервис (порт 8586)  
+config-server - ConfigServer (порт 50302)  
+eureka-server - Eureka (порт 50100)  
+zuul - Zuul + Ribbon (порт 50301)  
+/home/s243891/ss3/config - локальный  репозиторий для централизованного хранения файлов конфигурации  
+Фронт раздаётся на https://se.ifmo.ru/~s243891/  
 
 ```
 Конфигурация haproxy (/home/s243891/ss3/haproxy.my.cfg):
