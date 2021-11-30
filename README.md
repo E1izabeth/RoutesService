@@ -5,23 +5,24 @@
   ## Задание
 Разработать веб-сервис на базе сервлета, реализующий управление коллекцией объектов, и клиентское веб-приложение, предоставляющее интерфейс к разработанному веб-сервису. В коллекции необходимо хранить объекты класса Route, описание которого приведено ниже:
 
-```public class Route {
-private Long id; //Поле не может быть null, Значение поля должно быть больше 0, Значение этого поля должно быть уникальным, Значение этого поля должно генерироваться автоматически
-private String name; //Поле не может быть null, Строка не может быть пустой
-private Coordinates coordinates; //Поле не может быть null
-private java.time.LocalDate creationDate; //Поле не может быть null, Значение этого поля должно генерироваться автоматически
-private Location from; //Поле не может быть null
-private Location to; //Поле не может быть null
-private Long distance; //Поле может быть null, Значение поля должно быть больше 1
+```
+public class Route {
+  private Long id; //Поле не может быть null, Значение поля должно быть больше 0, Значение этого поля должно быть уникальным, Значение этого поля должно генерироваться автоматически
+  private String name; //Поле не может быть null, Строка не может быть пустой
+  private Coordinates coordinates; //Поле не может быть null
+  private java.time.LocalDate creationDate; //Поле не может быть null, Значение этого поля должно генерироваться автоматически
+  private Location from; //Поле не может быть null
+  private Location to; //Поле не может быть null
+  private Long distance; //Поле может быть null, Значение поля должно быть больше 1
 }
 public class Coordinates {
-private Integer x; //Максимальное значение поля: 241, Поле не может быть null
-private double y; //Максимальное значение поля: 180
+  private Integer x; //Максимальное значение поля: 241, Поле не может быть null
+  private double y; //Максимальное значение поля: 180
 }
 public class Location {
-private Integer x; //Поле не может быть null
-private int y;
-private Float z; //Поле не может быть null
+  private Integer x; //Поле не может быть null
+  private int y;
+  private Float z; //Поле не может быть null
 }
 ```
 
